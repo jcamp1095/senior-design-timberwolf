@@ -3,9 +3,17 @@ Feedback Notes:
 10/14/17
 
 Sam Guyer:
-Overall, I like your project proposal. You have a lot of interesting points in the “Problem” and “Context” section, but in some ways they are both descriptions of the context. I’d like to see more details about the technical nature of the problem. You are trying to use SMS to support services/technologies that would normally use cellular data. Those two methods of communication have very different properties, so it will be challenging to make services tolerant to those differences.
+Overall, I like your project proposal. You have a lot of interesting points in 
+the “Problem” and “Context” section, but in some ways they are both descriptions
+of the context. I’d like to see more details about the technical nature of the
+problem. You are trying to use SMS to support services/technologies that would
+normally use cellular data. Those two methods of communication have very
+different properties, so it will be challenging to make services tolerant to 
+those differences.
 
-Great job on the risks. The next step is to think about how to mitigate those risks -- what are some options you could explore if these mechanisms don’t work the way you want them to?
+Great job on the risks. The next step is to think about how to mitigate those 
+risks -- what are some options you could explore if these mechanisms don’t 
+work the way you want them to?
 
 response: 
 
