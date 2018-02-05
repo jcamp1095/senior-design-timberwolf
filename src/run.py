@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 @app.route("/sms", methods=['POST'])
 def sms_ahoy_reply():
-    """Respond to incoming messages with a friendly SMS."""
+
     # Start our response
     number = ""
     message_body = ""
