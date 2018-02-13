@@ -1,3 +1,4 @@
 Flask>=0.12
 twilio~=6.0.0
 googlemaps
+setuptools>=38.5.1
