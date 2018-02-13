@@ -25,3 +25,5 @@ backend server via SMS communication. To prove the technology, we will develop a
 5. Run the app by running `python run.py`
 
 6. In a different tab, run Ngrok through the command `./ngrok http 5000`
+
+7. On the Twilio console, edit the "A message comes in" field under the Messaging section with the secure Forwarding URL in the Ngrok window.
