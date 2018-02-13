@@ -2,11 +2,15 @@
 # Download the twilio-python library from twilio.com/docs/libraries/python
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
+import googlemaps
+from datetime import datetime
 
 app = Flask(__name__)
 
+gmaps = googlemaps.Client(key='AIzaSyDREJYIfMrsNcZQCs09OalqjfHIdRsmHdA')
+
 @app.route("/sms", methods=['POST'])
-def sms_ahoy_reply():
+def sms_reply():
 
     # Start our response
     number = ""
