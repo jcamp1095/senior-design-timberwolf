@@ -25,9 +25,7 @@ public class GPSTracker extends Service implements LocationListener
     Location location;
     double latitude;
     double longitude;
-    boolean isNetworkEnabled = false;
     boolean canGetLocation = false;
-    boolean isGPSEnabled = false;
 
     // The minimum distance to change Updates in meters
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
@@ -45,18 +43,17 @@ public class GPSTracker extends Service implements LocationListener
 
     public Location getLocation() {
         locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
-        isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        //isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        //isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
         // getting GPS status
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             showSettingsAlert();
+        } else {
+            canGetLocation = true;
         }
 
         try {
-            if (isGPSEnabled && isNetworkEnabled) {
-                this.canGetLocation = true;
-            }
             if (location == null) {
                 locationManager.requestLocationUpdates(
                         LocationManager.GPS_PROVIDER,
@@ -137,6 +134,16 @@ public class GPSTracker extends Service implements LocationListener
     public IBinder onBind(Intent arg0)
     {
         return null;
+    }
+
+    public double getLatitude()
+    {
+        return latitude;
+    }
+
+    public double getLongitude()
+    {
+        return longitude;
     }
 
 

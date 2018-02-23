@@ -1,6 +1,8 @@
 package com.tmj.timberwolf;
 
-import android.location.Location;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.SmsManager;
@@ -12,12 +14,20 @@ public class LandingActivity extends AppCompatActivity {
 
     private GPSTracker gpsTracker;
 
+    private static final String[] INITIAL_PERMS={
+            Manifest.permission.ACCESS_FINE_LOCATION
+    };
+    private static final int INITIAL_REQUEST=1337;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_landing);
-        gpsTracker = new GPSTracker(LandingActivity.this);
         Button ShowLocationButton = findViewById(R.id.button);
+        if (Build.VERSION.SDK_INT >= 23 && !canAccessLocation()) {
+            requestPermissions(INITIAL_PERMS, INITIAL_REQUEST);
+        }
 
         ShowLocationButton.setOnClickListener(new View.OnClickListener()
         {
@@ -28,15 +38,13 @@ public class LandingActivity extends AppCompatActivity {
 
                 if (gpsTracker.canGetLocation())
                 {
-                    Location loc = gpsTracker.getLocation();
-                    double longitude = loc.getLongitude();
-                    double latitude = loc.getLatitude();
+                    double longitude = gpsTracker.getLongitude();
+                    double latitude = gpsTracker.getLatitude();
 
-                    Toast.makeText(getApplicationContext(), "Location : \nLAT " + latitude + "\nLNG " + longitude, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Location : \nLAT " + Double.toString(latitude) + "\nLNG " + Double.toString(longitude), Toast.LENGTH_LONG).show();
                 }
                 else
                 {
-                    // Konum bilgisi alinamiyorsa mesaj kutusunu goster
                     gpsTracker.showSettingsAlert();
                 }
             }
@@ -65,5 +73,12 @@ public class LandingActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
             ex.printStackTrace();
         }
+    }
+    private boolean canAccessLocation() {
+        return(hasPermission(Manifest.permission.ACCESS_FINE_LOCATION));
+    }
+    private boolean hasPermission(String perm) {
+        return (Build.VERSION.SDK_INT >= 23 && PackageManager.PERMISSION_GRANTED==checkSelfPermission(perm));
+
     }
 }
