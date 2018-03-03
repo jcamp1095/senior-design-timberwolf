@@ -9,6 +9,10 @@ app = Flask(__name__)
 
 gmaps = googlemaps.Client(key='AIzaSyDREJYIfMrsNcZQCs09OalqjfHIdRsmHdA')
 
+@app.route("/", methods=['GET'])
+def hello():
+    return "hello world"
+    
 @app.route("/sms", methods=['POST'])
 def sms_reply():
 
