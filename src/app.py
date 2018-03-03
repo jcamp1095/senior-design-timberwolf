@@ -23,9 +23,15 @@ def sms_reply():
 
     if request:
         number = request.form['From']
-        message_body = request.form['Body']
+        message_body = request.form['Body'].split('|')
+        latlng = message_body[0]
+        dest = message_body[1]
 
-    # Add a message
+        directions_result = gmaps.directions(latlng, dest, mode="driving", departure_time=datetime.now())
+
+
+
+    # Add a message    
     resp.message("Ahoy! Thanks so much for your message.\n" +
                  "Your Number is: " + number + "\nYour message was: " +  
                  message_body)
