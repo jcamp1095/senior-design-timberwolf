@@ -6,11 +6,20 @@ from flask_googlemaps import GoogleMaps
 from flask_googlemaps import Map, icons
 import googlemaps
 from datetime import datetime
+import os  
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from flask import send_from_directory
 
 app = Flask(__name__, template_folder="templates")
 app.config['GOOGLEMAPS_KEY'] = 'AIzaSyC0zzB_Q8nHoJD4m0TNrYgV84buZdRQOnc'
 GoogleMaps(app)
 gmaps = googlemaps.Client(key='AIzaSyDREJYIfMrsNcZQCs09OalqjfHIdRsmHdA')
+
+
+#chrome --headless --disable-gpu --screenshot https://www.google.com/maps/dir/42.408413,-71.1161627/42.608413,-71.1261627
+#https://developers.google.com/web/updates/2017/04/headless-chrome
+#https://duo.com/decipher/driving-headless-chrome-with-python
 
 @app.route("/", methods=['GET'])
 def hello():
@@ -62,6 +71,9 @@ def fullmap():
     )
     return render_template('example_fullmap.html', fullmap=fullmap)
 
+@app.route('/uploads/<filename>', methods=['GET', 'POST'])
+def uploaded_file(filename):
+    return send_from_directory('./',filename)
 
 @app.route("/sms", methods=['POST'])
 def sms_reply():
@@ -76,13 +88,26 @@ def sms_reply():
         latlng = message_body[0]
         dest = message_body[1]
         directions_result = gmaps.directions(latlng, dest, mode="driving", departure_time=datetime.now())
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        chrome_options.binary_location = '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary'
+        driver = webdriver.Chrome(executable_path=os.path.abspath("chromedriver"),   chrome_options=chrome_options)
+        driver.get("https://www.google.com/maps/dir/"+latlng+"/"+dest)
+        #driver.get("https://0faed219.ngrok.io/map")
+        driver.save_screenshot('output.png')
+        driver.close()
 
 
+        #TODO we can probably use the timberwold.herokuapp.com/map with pararms like ?lat=xxx etc. 
 
-    # Add a message    
-    resp.message("Ahoy! Thanks so much for your message.\n" +
+        msg = resp.message("Ahoy! Thanks so much for your message.\n" +
                  "Your Number is: " + number + "\nYour message was: " +  
-                 message_body)
+                 str(message_body))
+
+
+        # Add a picture message
+        msg.media('https://0faed219.ngrok.io/uploads/{}'.format('output.png'))
+
 
     return str(resp)
 
