@@ -90,7 +90,7 @@ def sms_reply():
         directions_result = gmaps.directions(latlng, dest, mode="driving", departure_time=datetime.now())
         chrome_options = Options()
         chrome_options.add_argument("--headless")
-        driver = webdriver.Chrome(executable_path=os.path.abspath("chromedriver"),   chrome_options=chrome_options)
+        driver = webdriver.Chrome("./chromedriver",   chrome_options=chrome_options)
         driver.get("https://www.google.com/maps/dir/"+latlng+"/"+dest)
         #driver.get("https://timberwolf.herokuapp.com/map")
         driver.save_screenshot('output.png')
