@@ -83,6 +83,7 @@ def sms_reply():
     resp = MessagingResponse() #ewef
 
     if request:
+        chrome_bin = os.environ.get('GOOGLE_CHROME_SHIM', None)
         number = request.form['From']
         message_body = request.form['Body'].split('|')
         latlng = message_body[0]
@@ -90,7 +91,8 @@ def sms_reply():
         directions_result = gmaps.directions(latlng, dest, mode="driving", departure_time=datetime.now())
         chrome_options = Options()
         chrome_options.add_argument("--headless")
-        driver = webdriver.Chrome("./chromedriver",   chrome_options=chrome_options)
+        chrome_options.binary_location = chrome_bin
+        driver = webdriver.Chrome(executable_path="chromedriver",   chrome_options=chrome_options)
         driver.get("https://www.google.com/maps/dir/"+latlng+"/"+dest)
         #driver.get("https://timberwolf.herokuapp.com/map")
         driver.save_screenshot('output.png')
