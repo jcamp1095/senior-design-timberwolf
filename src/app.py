@@ -90,10 +90,9 @@ def sms_reply():
         directions_result = gmaps.directions(latlng, dest, mode="driving", departure_time=datetime.now())
         chrome_options = Options()
         chrome_options.add_argument("--headless")
-        chrome_options.binary_location = '/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary'
         driver = webdriver.Chrome(executable_path=os.path.abspath("chromedriver"),   chrome_options=chrome_options)
         driver.get("https://www.google.com/maps/dir/"+latlng+"/"+dest)
-        #driver.get("https://0faed219.ngrok.io/map")
+        #driver.get("https://timberwolf.herokuapp.com/map")
         driver.save_screenshot('output.png')
         driver.close()
 
@@ -106,7 +105,7 @@ def sms_reply():
 
 
         # Add a picture message
-        msg.media('https://0faed219.ngrok.io/uploads/{}'.format('output.png'))
+        msg.media('https://timberwolf.herokuapp.com/uploads/{}'.format('output.png'))
 
 
     return str(resp)
