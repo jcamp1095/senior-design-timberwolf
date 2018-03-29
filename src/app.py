@@ -80,7 +80,7 @@ def sms_reply():
     # Start our response
     number = ""
     message_body = ""
-    resp = MessagingResponse() #ewe
+    resp = MessagingResponse() #ewef
 
     if request:
         number = request.form['From']
