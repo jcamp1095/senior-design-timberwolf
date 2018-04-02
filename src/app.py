@@ -111,7 +111,7 @@ def sms_reply():
 
         # Add a picture message
         #msg.media('https://timberwolf.herokuapp.com/uploads/{}'.format('output.png'))
-        msg.media('https://364c2537.ngrok.io/uploads/{}'.format('output.png'))
+        msg.media('https://timberwolf.herokuapp.com/uploads/{}'.format('output.png'))
 
 
     return str(resp)
