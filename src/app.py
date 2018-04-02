@@ -15,6 +15,8 @@ app = Flask(__name__, template_folder="templates")
 app.config['GOOGLEMAPS_KEY'] = 'AIzaSyC0zzB_Q8nHoJD4m0TNrYgV84buZdRQOnc'
 GoogleMaps(app)
 gmaps = googlemaps.Client(key='AIzaSyDREJYIfMrsNcZQCs09OalqjfHIdRsmHdA')
+GOOGLE_CHROME_BIN = os.environ.get('GOOGLE_CHROME_BIN')
+CHROMEDRIVER_PATH = os.environ.get('CHROMEDRIVER_PATH')
 
 
 #chrome --headless --disable-gpu --screenshot https://www.google.com/maps/dir/42.408413,-71.1161627/42.608413,-71.1261627
@@ -83,16 +85,17 @@ def sms_reply():
     resp = MessagingResponse() #ewef
 
     if request:
-        chrome_bin = os.environ.get('GOOGLE_CHROME_SHIM', None)
         number = request.form['From']
         message_body = request.form['Body'].split('|')
         latlng = message_body[0]
         dest = message_body[1]
         directions_result = gmaps.directions(latlng, dest, mode="driving", departure_time=datetime.now())
         chrome_options = Options()
+        chrome_options.binary_location = GOOGLE_CHROME_BIN
         chrome_options.add_argument("--headless")
-        chrome_options.binary_location = chrome_bin
-        driver = webdriver.Chrome(executable_path="chromedriver",   chrome_options=chrome_options)
+        chrome_options.add_argument('--disable-gpu')
+        chrome_options.add_argument('--no-sandbox')
+        driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
         driver.get("https://www.google.com/maps/dir/"+latlng+"/"+dest)
         #driver.get("https://timberwolf.herokuapp.com/map")
         driver.save_screenshot('output.png')
@@ -107,7 +110,8 @@ def sms_reply():
 
 
         # Add a picture message
-        msg.media('https://timberwolf.herokuapp.com/uploads/{}'.format('output.png'))
+        #msg.media('https://timberwolf.herokuapp.com/uploads/{}'.format('output.png'))
+        msg.media('https://364c2537.ngrok.io/uploads/{}'.format('output.png'))
 
 
     return str(resp)
