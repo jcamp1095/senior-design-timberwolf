@@ -108,10 +108,7 @@ def sms_reply():
                  "Your Number is: " + number + "\nYour message was: " +  
                  str(message_body))
 
-
-        # Add a picture message
-        #msg.media('https://timberwolf.herokuapp.com/uploads/{}'.format('output.png'))
-        msg.media('https://timberwolf.herokuapp.com/uploads/{}'.format('output.png'))
+        msg.media('https://97f64021.ngrok.io/uploads/{}'.format('output.png'))
 
 
     return str(resp)
