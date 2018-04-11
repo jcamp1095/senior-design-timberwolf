@@ -16,6 +16,8 @@ app = Flask(__name__, template_folder="templates")
 app.config['GOOGLEMAPS_KEY'] = 'AIzaSyC0zzB_Q8nHoJD4m0TNrYgV84buZdRQOnc'
 GoogleMaps(app)
 gmaps = googlemaps.Client(key='AIzaSyDREJYIfMrsNcZQCs09OalqjfHIdRsmHdA')
+GOOGLE_CHROME_BIN = os.environ.get('GOOGLE_CHROME_BIN')
+CHROMEDRIVER_PATH = os.environ.get('CHROMEDRIVER_PATH')
 
 
 #chrome --headless --disable-gpu --screenshot https://www.google.com/maps/dir/42.408413,-71.1161627/42.608413,-71.1261627
@@ -81,7 +83,7 @@ def sms_reply():
     # Start our response
     number = ""
     message_body = ""
-    resp = MessagingResponse()
+    resp = MessagingResponse() #ewef
 
     if request:
         number = request.form['From']
@@ -94,8 +96,11 @@ def sms_reply():
         directions_result = gmaps.directions(latlng, dest, mode="driving", departure_time=datetime.now())
         print directions_result
         chrome_options = Options()
+        chrome_options.binary_location = GOOGLE_CHROME_BIN
         chrome_options.add_argument("--headless")
-        driver = webdriver.Chrome(executable_path=os.path.abspath("chromedriver"),   chrome_options=chrome_options)
+        chrome_options.add_argument('--disable-gpu')
+        chrome_options.add_argument('--no-sandbox')
+        driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH, chrome_options=chrome_options)
         driver.get("https://www.google.com/maps/dir/"+latlng+"/"+dest)
         #driver.get("https://97f64021.ngrok.io/map")
         #driver.get("https://hpneo.github.io/gmaps/examples/routes.html")
@@ -107,8 +112,8 @@ def sms_reply():
         #msg.media('https://97f64021.ngrok.io/uploads/{}'.format('output_01_02.png'))
         #TODO we can probably use the timberwold.herokuapp.com/map with pararms like ?lat=xxx etc. 
 
-        msg = resp.message(str(directions_result))
-
+        #msg = resp.message(str(directions_result))
+        msg = resp.message(str("TEST"))
 
         # Add a picture message
         #msg.media('https://97f64021.ngrok.io/uploads/{}'.format('output.png'))

@@ -6,16 +6,21 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import io.nlopez.smartlocation.OnLocationUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
+import io.nlopez.smartlocation.location.config.LocationParams;
+import io.nlopez.smartlocation.location.providers.LocationManagerProvider;
 
 public class LandingActivity extends AppCompatActivity {
 
@@ -44,6 +49,14 @@ public class LandingActivity extends AppCompatActivity {
             @Override
             public void onClick(View arg0)
             {
+                SmartLocation.with(getApplicationContext()).
+                        location(new LocationManagerProvider()).oneFix().
+                        config(LocationParams.NAVIGATION).start(new OnLocationUpdatedListener() {
+                    @Override
+                    public void onLocationUpdated(Location location) {
+                        Log.i("Tag","LocationUpdate : "+location.getLatitude()+","+location.getLongitude());
+                    }
+                });
                 Intent intent = new Intent(LandingActivity.this, LoadingActivity.class);
                 startActivity(intent);
             }
