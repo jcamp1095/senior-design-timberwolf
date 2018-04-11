@@ -10,6 +10,7 @@ import os
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from flask import send_from_directory
+import image_slicer
 
 app = Flask(__name__, template_folder="templates")
 app.config['GOOGLEMAPS_KEY'] = 'AIzaSyC0zzB_Q8nHoJD4m0TNrYgV84buZdRQOnc'
@@ -87,25 +88,31 @@ def sms_reply():
         message_body = request.form['Body'].split('|')
         latlng = message_body[0]
         dest = message_body[1]
+        ll = latlng.split(',')
+        lat = ll[0]
+        lng = ll[1]
         directions_result = gmaps.directions(latlng, dest, mode="driving", departure_time=datetime.now())
+        print directions_result
         chrome_options = Options()
         chrome_options.add_argument("--headless")
         driver = webdriver.Chrome(executable_path=os.path.abspath("chromedriver"),   chrome_options=chrome_options)
         driver.get("https://www.google.com/maps/dir/"+latlng+"/"+dest)
-        #driver.get("https://timberwolf.herokuapp.com/map")
+        #driver.get("https://97f64021.ngrok.io/map")
+        #driver.get("https://hpneo.github.io/gmaps/examples/routes.html")
         driver.save_screenshot('output.png')
         driver.close()
 
-
+        #backup plan
+        image_slicer.slice('output.png', 2)
+        #msg.media('https://97f64021.ngrok.io/uploads/{}'.format('output_01_02.png'))
         #TODO we can probably use the timberwold.herokuapp.com/map with pararms like ?lat=xxx etc. 
 
-        msg = resp.message("Ahoy! Thanks so much for your message.\n" +
-                 "Your Number is: " + number + "\nYour message was: " +  
-                 str(message_body))
+        msg = resp.message(str(directions_result))
 
 
         # Add a picture message
-        msg.media('https://97f64021.ngrok.io/uploads/{}'.format('output.png'))
+        #msg.media('https://97f64021.ngrok.io/uploads/{}'.format('output.png'))
+        msg.media('https://97f64021.ngrok.io/uploads/{}'.format('output_01_02.png'))
 
 
     return str(resp)
