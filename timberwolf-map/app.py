@@ -3,7 +3,10 @@ from flask_googlemaps import GoogleMaps
 from flask_googlemaps import Map, icons
 import googlemaps
 from datetime import datetime
+from flask import jsonify
 import json
+import polyline as pline
+import math
 
 app = Flask(__name__, template_folder="templates")
 
@@ -20,54 +23,56 @@ def hello_world():
 def fullmap():
     latlng = request.args.get('latlng')
     dest = request.args.get('dest')
-    
+    w = 300
+    h = 500
     directions_result = gmaps.directions(latlng, dest, mode="driving", departure_time=datetime.now())[0]
     lat = latlng.split(',')[0]
     lng = latlng.split(',')[1]
+    lats = list()
+    lngs = list()
+    lines = pline.decode(directions_result['overview_polyline']['points'])
+    
+    for line in lines:
+        lats.append(line[0])
+        lngs.append(line[1])
 
-    fullmap = Map(
-        identifier="fullmap",
-        varname="fullmap",
+    GLOBE_WIDTH = 256 #a constant in Google's map projection
+    west = min(lngs)
+    east = max(lngs)
+    angle = east - west
+    if angle < 0:
+        angle += 360
+
+    north = max(lats)
+    south = min(lats)
+
+    anglens = abs(north) - abs(south)
+    if anglens < 0:
+        anglens += 360
+    
+    zoomew = math.floor(math.log(w * 360 / angle / GLOBE_WIDTH) / 0.6931471805599453)
+    zoomns = math.floor(math.log(h * 360 / anglens / GLOBE_WIDTH) / 0.6931471805599453)
+    zoom = min(zoomew, zoomns)
+
+
+    plinemap = Map(
+        identifier="plinemap",
+        varname="plinemap",
         style=(
-            "height:100%;"
-            "width:100%;"
+            "height:"+str(h)+"px;"
+            "width:"+str(w)+"px;"
             "top:0;"
             "left:0;"
             "position:absolute;"
             "z-index:200;"
         ),
-        lat = lat,
-        lng = lng,
-        #markers=[
-        #     {
-        #         'icon': '//maps.google.com/mapfiles/ms/icons/green-dot.png',
-        #         'lat': 37.4419,
-        #         'lng': -122.1419,
-        #         'infobox': "Hello I am <b style='color:green;'>GREEN</b>!"
-        #     },
-        #     {
-        #         'icon': '//maps.google.com/mapfiles/ms/icons/blue-dot.png',
-        #         'lat': 37.4300,
-        #         'lng': -122.1400,
-        #         'infobox': "Hello I am <b style='color:blue;'>BLUE</b>!"
-        #     },
-        #     {
-        #         'icon': icons.dots.yellow,
-        #         'title': 'Click Here',
-        #         'lat': 37.4500,
-        #         'lng': -122.1350,
-        #         'infobox': (
-        #             "Hello I am <b style='color:#ffcc00;'>YELLOW</b>!"
-        #             "<h2>It is HTML title</h2>"
-        #             "<img src='//placehold.it/50'>"
-        #             "<br>Images allowed!"
-        #         )
-        #     }
-        # ],
-        polyline = directions_result['overview_polyline']
+        zoom=zoom,
+        lat=(min(lats)+max(lats))/2,
+        lng=(min(lngs)+max(lngs))/2,
+        polylines=[lines]
     )
 
-    return render_template('example_fullmap.html', fullmap=fullmap)
+    return render_template('example_fullmap.html', plinemap=plinemap)
 
 if __name__ == "__main__":
     app.run(debug=True)
