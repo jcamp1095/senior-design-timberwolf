@@ -4,7 +4,6 @@ from flask_googlemaps import Map, icons
 import googlemaps
 from datetime import datetime
 from flask import jsonify
-import json
 import polyline as pline
 import math
 
@@ -75,4 +74,4 @@ def fullmap():
     return render_template('example_fullmap.html', plinemap=plinemap)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='127.0.0.1', port=8000, debug=True)
