@@ -93,10 +93,12 @@ def sms_reply():
         directions_result = gmaps.directions(latlng, dest, mode="driving", departure_time=datetime.now())
         chrome_options = Options()
         chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--window-size=300,500")
+        chrome_options.add_argument("--disable-gpu")
         driver = webdriver.Chrome(executable_path=os.path.abspath("chromedriver"),   chrome_options=chrome_options)
         #driver.get("https://www.google.com/maps/dir/"+latlng+"/"+dest)
         #driver.get("https://timberwolf.herokuapp.com/map")
-        driver.get("https://c2b4ac12.ngrok.io/map?latlng="+latlng+"&dest="+dest)
+        driver.get("https://c4d4f8f3.ngrok.io/map?latlng="+latlng+"&dest="+dest)
         driver.save_screenshot('output.png')
         driver.close()
         
@@ -106,12 +108,11 @@ def sms_reply():
         #TODO we can probably use the timberwold.herokuapp.com/map with pararms like ?lat=xxx etc. 
 
         #msg = resp.message(str(directions_result))
-        msg = resp.message("Ahoy! Thanks so much for your message.\n" + "Your Number is: " + number + "\nYour message was: " + str(message_body))
+        msg = resp.message("")
 
         # Add a picture message
         #msg.media('https://97f64021.ngrok.io/uploads/{}'.format('output.png'))
-        msg.media('https://dcf92687.ngrok.io/uploads/{}'.format('output.png'))
-
+        msg.media('https://78dc491c.ngrok.io/uploads/{}'.format('output.png'))
 
     return str(resp)
 
