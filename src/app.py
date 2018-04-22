@@ -74,7 +74,7 @@ def sms_reply():
 
             msg = resp.message("image")
 
-            msg.media('https://34af95b1.ngrok.io/uploads/{}'.format(encoded))
+            msg.media('https://aa497db1.ngrok.io/uploads/{}'.format(encoded))
 
         else:
             directions_result = gmaps.directions(latlng, dest, mode="driving", departure_time=datetime.now())
