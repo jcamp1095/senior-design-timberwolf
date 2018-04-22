@@ -11,6 +11,11 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from flask import send_from_directory
 import image_slicer
+import MercatorProjection
+import polyline as pline
+import math
+from time import sleep
+import base64
 
 app = Flask(__name__, template_folder="templates")
 app.config['GOOGLEMAPS_KEY'] = 'AIzaSyC0zzB_Q8nHoJD4m0TNrYgV84buZdRQOnc'
@@ -28,52 +33,6 @@ CHROMEDRIVER_PATH = os.environ.get('CHROMEDRIVER_PATH')
 def hello():
     return "hello world"
 
-@app.route("/map", methods=['GET'])
-def fullmap():
-    fullmap = Map(
-        identifier="fullmap",
-        varname="fullmap",
-        style=(
-            "height:100%;"
-            "width:100%;"
-            "top:0;"
-            "left:0;"
-            "position:absolute;"
-            "z-index:200;"
-        ),
-        lat=37.4419,
-        lng=-122.1419,
-        markers=[
-            {
-                'icon': '//maps.google.com/mapfiles/ms/icons/green-dot.png',
-                'lat': 37.4419,
-                'lng': -122.1419,
-                'infobox': "Hello I am <b style='color:green;'>GREEN</b>!"
-            },
-            {
-                'icon': '//maps.google.com/mapfiles/ms/icons/blue-dot.png',
-                'lat': 37.4300,
-                'lng': -122.1400,
-                'infobox': "Hello I am <b style='color:blue;'>BLUE</b>!"
-            },
-            {
-                'icon': icons.dots.yellow,
-                'title': 'Click Here',
-                'lat': 37.4500,
-                'lng': -122.1350,
-                'infobox': (
-                    "Hello I am <b style='color:#ffcc00;'>YELLOW</b>!"
-                    "<h2>It is HTML title</h2>"
-                    "<img src='//placehold.it/50'>"
-                    "<br>Images allowed!"
-                )
-            }
-        ],
-        # maptype = "TERRAIN",
-        # zoom="5"
-    )
-    return render_template('example_fullmap.html', fullmap=fullmap)
-
 @app.route('/uploads/<filename>', methods=['GET', 'POST'])
 def uploaded_file(filename):
     return send_from_directory('./',filename)
@@ -84,35 +43,73 @@ def sms_reply():
     number = ""
     message_body = ""
     resp = MessagingResponse() #ewef
+    w = 300
+    h = 500
 
     if request:
         number = request.form['From']
         message_body = request.form['Body'].split('|')
         latlng = message_body[0]
         dest = message_body[1]
-        directions_result = gmaps.directions(latlng, dest, mode="driving", departure_time=datetime.now())
-        chrome_options = Options()
-        chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--window-size=300,500")
-        chrome_options.add_argument("--disable-gpu")
-        driver = webdriver.Chrome(executable_path=os.path.abspath("chromedriver"),   chrome_options=chrome_options)
-        #driver.get("https://www.google.com/maps/dir/"+latlng+"/"+dest)
-        #driver.get("https://timberwolf.herokuapp.com/map")
-        driver.get("https://c4d4f8f3.ngrok.io/map?latlng="+latlng+"&dest="+dest)
-        driver.save_screenshot('output.png')
-        driver.close()
-        
-        #backup plan
-        #image_slicer.slice('output.png', 2)
-        #msg.media('https://97f64021.ngrok.io/uploads/{}'.format('output_01_02.png'))
-        #TODO we can probably use the timberwold.herokuapp.com/map with pararms like ?lat=xxx etc. 
+        getimage = message_body[2]
 
-        #msg = resp.message(str(directions_result))
-        msg = resp.message("")
+        if getimage == '1':
+            [os.remove(os.path.join("./",f)) for f in os.listdir("./") if f.endswith(".png")]
+            encoded = base64.b64encode(latlng + dest)
+            encoded = str(encoded) + '.png'
+            chrome_options = Options()
 
-        # Add a picture message
-        #msg.media('https://97f64021.ngrok.io/uploads/{}'.format('output.png'))
-        msg.media('https://78dc491c.ngrok.io/uploads/{}'.format('output.png'))
+            chrome_options.add_argument("--headless")
+            chrome_options.add_argument("--window-size=300,500")
+            chrome_options.add_argument("--disable-gpu")
+            chrome_options.add_argument("--disable-application-cache")
+            chrome_options.add_argument("--incognito")
+            driver = webdriver.Chrome(executable_path=os.path.abspath("chromedriver"),   chrome_options=chrome_options)
+            #driver.get("https://www.google.com/maps/dir/"+latlng+"/"+dest)
+            #driver.get("https://timberwolf.herokuapp.com/map")
+
+            driver.get("https://c79d375b.ngrok.io/map?latlng="+latlng+"&dest="+dest)
+            driver.save_screenshot(encoded)
+            driver.close()
+
+            msg = resp.message("image")
+
+            msg.media('https://34af95b1.ngrok.io/uploads/{}'.format(encoded))
+
+        else:
+            directions_result = gmaps.directions(latlng, dest, mode="driving", departure_time=datetime.now())
+
+            lats = list()
+            lngs = list()
+
+            lines = pline.decode(directions_result[0]['overview_polyline']['points'])
+            
+            for line in lines:
+                lats.append(line[0])
+                lngs.append(line[1])
+
+            GLOBE_WIDTH = 256 #a constant in Google's map projection
+            west = min(lngs)
+            east = max(lngs)
+            angle = east - west
+            if angle < 0:
+                angle += 360
+
+            north = max(lats)
+            south = min(lats)
+
+            anglens = abs(north) - abs(south)
+            if anglens < 0:
+                anglens += 360
+            
+            zoomew = math.floor(math.log(w * 360 / angle / GLOBE_WIDTH) / 0.6931471805599453)
+            zoomns = math.floor(math.log(h * 360 / anglens / GLOBE_WIDTH) / 0.6931471805599453)
+            zoom = min(zoomew, zoomns)
+
+            centerPoint = MercatorProjection.G_LatLng((min(lats)+max(lats))/2, (min(lngs)+max(lngs))/2)
+            corners = MercatorProjection.getCorners(centerPoint, zoom, w, h)
+            msg = resp.message("E: " + str(corners['E']) + " N: " + str(corners['N']) + " S: " + str(corners['S']) + " W: " + str(corners['W'])) 
+
 
     return str(resp)
 
