@@ -20,13 +20,11 @@ def hello_world():
 
 @app.route("/map", methods=['GET'])
 def fullmap():
-    latlng = request.args.get('latlng')
+    start = request.args.get('start')
     dest = request.args.get('dest')
     w = 300
     h = 500
-    directions_result = gmaps.directions(latlng, dest, mode="driving", departure_time=datetime.now())[0]
-    lat = latlng.split(',')[0]
-    lng = latlng.split(',')[1]
+    directions_result = gmaps.directions(start, dest, mode="driving", departure_time=datetime.now())[0]
     lats = list()
     lngs = list()
     lines = pline.decode(directions_result['overview_polyline']['points'])
