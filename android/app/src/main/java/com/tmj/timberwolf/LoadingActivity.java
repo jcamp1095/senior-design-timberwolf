@@ -6,7 +6,9 @@ import android.location.Location;
 import android.os.Bundle;
 import android.provider.Telephony;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.SmsManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
@@ -32,7 +34,7 @@ public class LoadingActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String source = intent.getStringExtra("source");
-        String destination = intent.getStringExtra("destination");
+        final String destination = intent.getStringExtra("destination");
         if (source.equals("Your location")) {
             SmartLocation.with(getApplicationContext()).
                     location(new LocationManagerProvider()).oneFix().
@@ -40,10 +42,27 @@ public class LoadingActivity extends AppCompatActivity {
                 @Override
                 public void onLocationUpdated(Location location) {
                     Log.i("Tag","LocationUpdate : "+location.getLatitude()+","+location.getLongitude());
+                    sendSMS("6178588563", location.getLatitude()+","+location.getLongitude()+"|"+destination+"|1");
+                    sendSMS("6178588563", location.getLatitude()+","+location.getLongitude()+"|"+destination+"|2");
                 }
             });
+        } else {
+            sendSMS("6178588563", "test");
         }
 
+    }
+
+    public void sendSMS(String phoneNo, String msg) {
+        try {
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(phoneNo, null, msg, null, null);
+            Toast.makeText(getApplicationContext(), "Message Sent",
+                    Toast.LENGTH_LONG).show();
+        } catch (Exception ex) {
+            Toast.makeText(getApplicationContext(),ex.getMessage().toString(),
+                    Toast.LENGTH_LONG).show();
+            ex.printStackTrace();
+        }
     }
 
     @Override
