@@ -49,13 +49,13 @@ def sms_reply():
     if request:
         number = request.form['From']
         message_body = request.form['Body'].split('|')
-        latlng = message_body[0]
+        start = message_body[0]
         dest = message_body[1]
         getimage = message_body[2]
 
         if getimage == '1':
             [os.remove(os.path.join("./",f)) for f in os.listdir("./") if f.endswith(".png")]
-            encoded = base64.b64encode(latlng + dest)
+            encoded = base64.b64encode(start + dest)
             encoded = str(encoded) + '.png'
             chrome_options = Options()
 
@@ -65,10 +65,10 @@ def sms_reply():
             chrome_options.add_argument("--disable-application-cache")
             chrome_options.add_argument("--incognito")
             driver = webdriver.Chrome(executable_path=os.path.abspath("chromedriver"),   chrome_options=chrome_options)
-            #driver.get("https://www.google.com/maps/dir/"+latlng+"/"+dest)
+            #driver.get("https://www.google.com/maps/dir/"+start+"/"+dest)
             #driver.get("https://timberwolf.herokuapp.com/map")
 
-            driver.get("https://d5f80a8e.ngrok.io/map?latlng="+latlng+"&dest="+dest)
+            driver.get("https://c79d375b.ngrok.io/map?start="+start+"&dest="+dest)
             driver.save_screenshot(encoded)
             driver.close()
 
@@ -77,7 +77,7 @@ def sms_reply():
             msg.media('https://12dff319.ngrok.io/uploads/{}'.format(encoded))
 
         else:
-            directions_result = gmaps.directions(latlng, dest, mode="driving", departure_time=datetime.now())
+            directions_result = gmaps.directions(start, dest, mode="driving", departure_time=datetime.now())
 
             lats = list()
             lngs = list()
