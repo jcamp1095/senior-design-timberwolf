@@ -54,6 +54,11 @@ public class LandingActivity extends AppCompatActivity {
             public void onClick(View arg0)
             {
                 Intent intent = new Intent(LandingActivity.this, MapActivity.class);
+//                intent.putExtra("latN", 43.5801473056);
+//                double latN = 43.5801473056;
+//                double latS = 39.4698655864;
+//                double lngE = -70.9867357813;
+//                double lngW = -74.2826342188;
                 startActivity(intent);
 
 //                String s = source.getText() + "";
