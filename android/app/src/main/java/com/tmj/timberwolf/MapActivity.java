@@ -76,6 +76,10 @@ public class MapActivity extends AppCompatActivity {
                         float verticalDistToLine = (float)distance(latN, location.getLatitude(), lngW, lngW,1, 1);
                         float verticalPixel = verticalDistToLine / verticalDist * mapHeight;
 
+                        final ImageView imageView = findViewById(R.id.imageView);
+                        final Bitmap mBitMap = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.image_1_6).copy(Bitmap.Config.ARGB_8888, true);
+                        imageView.setImageBitmap(mBitMap);
+                        final Canvas mCanvas = new Canvas(mBitMap);
                         mCanvas.drawPoint(horizontalPixel, verticalPixel, mPaint);
                         imageView.invalidate();
                     }

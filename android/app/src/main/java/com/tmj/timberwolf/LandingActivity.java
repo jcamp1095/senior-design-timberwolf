@@ -60,8 +60,6 @@ public class LandingActivity extends AppCompatActivity {
                 b.putDouble("latS", 39.46986558640);
                 b.putDouble("latE", -70.9867357813);
                 b.putDouble("latW", -74.2826342188);
-                b.putDouble("startLat", 42.407282948);
-                b.putDouble("startLng", -71.2984292);
                 intent.putExtras(b);
 
                 startActivity(intent);

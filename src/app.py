@@ -49,9 +49,10 @@ def sms_reply():
     if request:
         number = request.form['From']
         message_body = request.form['Body'].split('|')
-        start = message_body[0]
-        dest = message_body[1]
-        getimage = message_body[2]
+        unique_number = message_body[0]
+        start = message_body[1]
+        dest = message_body[2]
+        getimage = message_body[3]
 
         if getimage == '1':
             [os.remove(os.path.join("./",f)) for f in os.listdir("./") if f.endswith(".png")]
@@ -68,13 +69,13 @@ def sms_reply():
             #driver.get("https://www.google.com/maps/dir/"+start+"/"+dest)
             #driver.get("https://timberwolf.herokuapp.com/map")
 
-            driver.get("https://c79d375b.ngrok.io/map?start="+start+"&dest="+dest)
+            driver.get("https://314e9536.ngrok.io/map?start="+start+"&dest="+dest)
             driver.save_screenshot(encoded)
             driver.close()
 
             msg = resp.message("image")
 
-            msg.media('https://12dff319.ngrok.io/uploads/{}'.format(encoded))
+            msg.media('https://52dfceaf.ngrok.io/uploads/{}'.format(encoded))
 
         else:
             directions_result = gmaps.directions(start, dest, mode="driving", departure_time=datetime.now())
@@ -108,7 +109,7 @@ def sms_reply():
 
             centerPoint = MercatorProjection.G_LatLng((min(lats)+max(lats))/2, (min(lngs)+max(lngs))/2)
             corners = MercatorProjection.getCorners(centerPoint, zoom, w, h)
-            msg = resp.message("E: " + str(corners['E']) + " N: " + str(corners['N']) + " S: " + str(corners['S']) + " W: " + str(corners['W'])) 
+            msg = resp.message(unique_number+"|" + str(corners['E']) + "|" + str(corners['N']) + "|" + str(corners['S']) + "|" + str(corners['W'])) 
 
 
     return str(resp)
