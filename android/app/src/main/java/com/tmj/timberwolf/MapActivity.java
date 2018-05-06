@@ -1,14 +1,19 @@
 package com.tmj.timberwolf;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
+
+import java.io.IOException;
 
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
@@ -16,34 +21,50 @@ import io.nlopez.smartlocation.location.config.LocationParams;
 import io.nlopez.smartlocation.location.providers.LocationManagerProvider;
 
 public class MapActivity extends AppCompatActivity {
-
+    private int PICK_IMAGE_REQUEST = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        final ImageView imageView = findViewById(R.id.imageView);
-        final Bitmap mBitMap = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.image_1_6).copy(Bitmap.Config.ARGB_8888, true);
-        imageView.setImageBitmap(mBitMap);
-        Bundle b = getIntent().getExtras();
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+    }
 
-        final Paint mPaint = new Paint();
-        mPaint.setColor(Color.BLUE);
-        mPaint.setStrokeWidth(100);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-        final Canvas mCanvas = new Canvas(mBitMap);
-        final float mapWidth = mBitMap.getWidth();
-        final float mapHeight = mBitMap.getHeight();
-        final double latN = b.getDouble("latN");
-        final double latS = b.getDouble("latS");
-        final double lngE = b.getDouble("latE");
-        final double lngW = b.getDouble("latW");
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+
+            Uri uri = data.getData();
+
+            try {
+                final Bitmap mBitMap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri).copy(Bitmap.Config.ARGB_8888, true);
+                final ImageView imageView = findViewById(R.id.imageView);
+                //final Bitmap mBitMap = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.image_1_6).copy(Bitmap.Config.ARGB_8888, true);
+                imageView.setImageBitmap(mBitMap);
+                Bundle b = getIntent().getExtras();
+
+                final Paint mPaint = new Paint();
+                mPaint.setColor(Color.BLUE);
+                mPaint.setStrokeWidth(100);
+
+                final Canvas mCanvas = new Canvas(mBitMap);
+                final float mapWidth = mBitMap.getWidth();
+                final float mapHeight = mBitMap.getHeight();
+                final double latN = b.getDouble("latN");
+                final double latS = b.getDouble("latS");
+                final double lngE = b.getDouble("latE");
+                final double lngW = b.getDouble("latW");
 
 
-        SmartLocation.with(getApplicationContext()).
-                location(new LocationManagerProvider()).
-                config(LocationParams.NAVIGATION).start(new OnLocationUpdatedListener() {
+                SmartLocation.with(getApplicationContext()).
+                        location(new LocationManagerProvider()).
+                        config(LocationParams.NAVIGATION).start(new OnLocationUpdatedListener() {
 
                     @Override
                     public void onLocationUpdated(Location location) {
@@ -58,11 +79,12 @@ public class MapActivity extends AppCompatActivity {
                         mCanvas.drawPoint(horizontalPixel, verticalPixel, mPaint);
                         imageView.invalidate();
                     }
-        });
-
-
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
-
 
     public static double distance(double lat1, double lat2, double lon1,
                                   double lon2, double el1, double el2) {

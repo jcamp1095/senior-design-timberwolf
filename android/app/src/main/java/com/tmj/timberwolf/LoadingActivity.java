@@ -10,25 +10,31 @@ import android.telephony.SmsManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.Random;
+
 import io.nlopez.smartlocation.OnLocationUpdatedListener;
 import io.nlopez.smartlocation.SmartLocation;
 import io.nlopez.smartlocation.location.config.LocationParams;
 import io.nlopez.smartlocation.location.providers.LocationManagerProvider;
 
 public class LoadingActivity extends AppCompatActivity {
-
+    final String number = "6178588563";
     private SmsBroadcastReceiver smsBroadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading);
-        smsBroadcastReceiver = new SmsBroadcastReceiver("6178588563", "");
+
+        Random rand = new Random();
+        final int randNum = rand.nextInt(1000);
+
+        smsBroadcastReceiver = new SmsBroadcastReceiver(number, Integer.toString(randNum));
         registerReceiver(smsBroadcastReceiver, new IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION));
         smsBroadcastReceiver.setListener(new SmsBroadcastReceiver.Listener() {
             @Override
             public void onTextReceived(String text) {
-                Log.i("test", text);
+                Log.i("test", "I got it!");
             }
         });
 
@@ -42,12 +48,13 @@ public class LoadingActivity extends AppCompatActivity {
                 @Override
                 public void onLocationUpdated(Location location) {
                     Log.i("Tag","LocationUpdate : "+location.getLatitude()+","+location.getLongitude());
-                    sendSMS("6178588563", location.getLatitude()+","+location.getLongitude()+"|"+destination+"|1");
-                    sendSMS("6178588563", location.getLatitude()+","+location.getLongitude()+"|"+destination+"|2");
+                    sendSMS("6178588563", randNum + "|" + location.getLatitude()+","+location.getLongitude()+"|"+destination+"|1");
+                    sendSMS("6178588563", randNum + "|" + location.getLatitude()+","+location.getLongitude()+"|"+destination+"|2");
                 }
             });
         } else {
-            sendSMS("6178588563", "test");
+            sendSMS("6178588563",randNum + "|" + source + "|" + destination + "|1");
+            sendSMS("6178588563",randNum + "|" + source + "|" + destination + "|2");
         }
 
     }
@@ -77,4 +84,6 @@ public class LoadingActivity extends AppCompatActivity {
         super.onStart();
 
     }
+
+    
 }
