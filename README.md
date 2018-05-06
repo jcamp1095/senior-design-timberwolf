@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Senior Capstone Project: SMS-based Navigation
 ## Team Timberwolf
 ### Joe Campbell, Michael Morisi, Tommy Tang
