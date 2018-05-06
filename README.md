@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Senior Capstone Project: SMS-based Navigation
 ## Team Timberwolf
 ### Joe Campbell, Michael Morisi, Tommy Tang
@@ -19,6 +18,8 @@ the frontend and backend. These texts dictate the route that will be generated a
 to the user based on the start and end destinations they specify. 
 
 # Building and running
+
+## To run the message-receiving server
 1. After cloning the repository, change into the src directory
 
 2. Set up a virtual environment (if not done already) by running `virtualenv --no-site-packages .`
@@ -29,9 +30,16 @@ to the user based on the start and end destinations they specify.
 
 5. Run the app by running `python app.py`
 
-6. In a different tab, run Ngrok through the command `./ngrok http 5000`
+6. In a different tab, in `src`, run Ngrok through the command `./ngrok http 5000`
 
 7. On the Twilio console, edit the "A message comes in" field under the Messaging section with the secure Forwarding URL in the Ngrok window.
+
+## To run the map-generating server
+1. Change into the `timberwolf-map/src` directory
+
+2. Run `python app.py` in a separate tab from the message-receiving tabs
+
+3. In a different tab, in `timberwolf-map`, run `./ngrok http 8000`
 
 # Future Work
 Integrating MMS messages into the app that we've built (e.g. the pictures we generate) was the main challenge
