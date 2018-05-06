@@ -69,13 +69,13 @@ def sms_reply():
             #driver.get("https://www.google.com/maps/dir/"+start+"/"+dest)
             #driver.get("https://timberwolf.herokuapp.com/map")
 
-            driver.get("https://314e9536.ngrok.io/map?start="+start+"&dest="+dest)
+            driver.get("https://0f190fab.ngrok.io/map?start="+start+"&dest="+dest)
             driver.save_screenshot(encoded)
             driver.close()
 
             msg = resp.message("image")
 
-            msg.media('https://52dfceaf.ngrok.io/uploads/{}'.format(encoded))
+            msg.media('https://4c3d3695.ngrok.io/uploads/{}'.format(encoded))
 
         else:
             directions_result = gmaps.directions(start, dest, mode="driving", departure_time=datetime.now())

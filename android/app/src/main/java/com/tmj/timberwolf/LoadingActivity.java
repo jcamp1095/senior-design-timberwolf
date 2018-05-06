@@ -34,7 +34,21 @@ public class LoadingActivity extends AppCompatActivity {
         smsBroadcastReceiver.setListener(new SmsBroadcastReceiver.Listener() {
             @Override
             public void onTextReceived(String text) {
-                Log.i("test", "I got it!");
+                Log.i("text message: ", text);
+                text = text.substring(38);
+                Log.i("new text message: ", text);
+                String delims = "\\|";
+                String[] tokens = text.split(delims);
+                Log.i("tocken east", tokens[1]);
+                Intent intent = new Intent(LoadingActivity.this, SelectionActivity.class);
+                Bundle b = new Bundle();
+                b.putDouble("latN", Double.parseDouble(tokens[2]));
+                b.putDouble("latS", Double.parseDouble(tokens[3]));
+                b.putDouble("latE", Double.parseDouble(tokens[1]));
+                b.putDouble("latW", Double.parseDouble(tokens[4]));
+                intent.putExtras(b);
+
+                startActivity(intent);
             }
         });
 

@@ -2,7 +2,6 @@ package com.tmj.timberwolf;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -40,7 +39,7 @@ public class MapActivity extends AppCompatActivity {
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
 
-            Uri uri = data.getData();
+            final Uri uri = data.getData();
 
             try {
                 final Bitmap mBitMap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri).copy(Bitmap.Config.ARGB_8888, true);
@@ -51,9 +50,9 @@ public class MapActivity extends AppCompatActivity {
 
                 final Paint mPaint = new Paint();
                 mPaint.setColor(Color.BLUE);
-                mPaint.setStrokeWidth(100);
+                mPaint.setStrokeWidth(50);
 
-                final Canvas mCanvas = new Canvas(mBitMap);
+                //final Canvas mCanvas = new Canvas(mBitMap);
                 final float mapWidth = mBitMap.getWidth();
                 final float mapHeight = mBitMap.getHeight();
                 final double latN = b.getDouble("latN");
@@ -68,20 +67,24 @@ public class MapActivity extends AppCompatActivity {
 
                     @Override
                     public void onLocationUpdated(Location location) {
-                        float horizontalDist = (float)distance(latN, latN, lngW, lngE,1, 1);
-                        float horizontalDistToLine = (float)distance(latN, latN, lngW, location.getLongitude(),1, 1);
-                        float horizontalPixel = horizontalDistToLine / horizontalDist * mapWidth;
+                        try {
+                            float horizontalDist = (float)distance(latN, latN, lngW, lngE,1, 1);
+                            float horizontalDistToLine = (float)distance(latN, latN, lngW, location.getLongitude(),1, 1);
+                            float horizontalPixel = horizontalDistToLine / horizontalDist * mapWidth;
 
-                        float verticalDist = (float)distance(latN, latS, lngW, lngW,1, 1);
-                        float verticalDistToLine = (float)distance(latN, location.getLatitude(), lngW, lngW,1, 1);
-                        float verticalPixel = verticalDistToLine / verticalDist * mapHeight;
+                            float verticalDist = (float)distance(latN, latS, lngW, lngW,1, 1);
+                            float verticalDistToLine = (float)distance(latN, location.getLatitude(), lngW, lngW,1, 1);
+                            float verticalPixel = verticalDistToLine / verticalDist * mapHeight;
 
-                        final ImageView imageView = findViewById(R.id.imageView);
-                        final Bitmap mBitMap = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.image_1_6).copy(Bitmap.Config.ARGB_8888, true);
-                        imageView.setImageBitmap(mBitMap);
-                        final Canvas mCanvas = new Canvas(mBitMap);
-                        mCanvas.drawPoint(horizontalPixel, verticalPixel, mPaint);
-                        imageView.invalidate();
+                            final ImageView imageView = findViewById(R.id.imageView);
+                            final Bitmap mBitMap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri).copy(Bitmap.Config.ARGB_8888, true);
+                            imageView.setImageBitmap(mBitMap);
+                            final Canvas mCanvas = new Canvas(mBitMap);
+                            mCanvas.drawPoint(horizontalPixel, verticalPixel, mPaint);
+                            imageView.invalidate();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
             } catch (IOException e) {
